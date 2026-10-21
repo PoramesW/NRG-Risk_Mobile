@@ -1,10 +1,13 @@
 import { ScrollView, Text, View, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useAuth } from '@/auth/auth-context';
 import ModuleCard from '@/components/module-card';
+import PrimaryButton from '@/components/primary-button';
 import { Colors } from '@/constants/theme';
 
 export default function DashboardScreen() {
+  const { user, signOut } = useAuth();
   const scheme = useColorScheme();
   const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
 
@@ -12,15 +15,15 @@ export default function DashboardScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         <Text style={{ fontSize: 28, fontWeight: '700', color: colors.text }}>NRG Risk</Text>
-        <Text style={{ marginTop: 4, marginBottom: 20, color: colors.text }}>
-          ภาพรวมความเสี่ยงด้านพลังงาน
+        <Text style={{ marginTop: 4, color: colors.text }}>
+          สวัสดี {user?.name} · ภาพรวมความเสี่ยงด้านพลังงาน
         </Text>
 
-        <View style={{ gap: 12 }}>
+        <View style={{ marginTop: 20, gap: 12 }}>
           <ModuleCard
             title="Historical Data"
             description="ข้อมูลพลังงานย้อนหลัง"
-            href="./historical"
+            href="/historical"
           />
           <ModuleCard
             title="Forecast"
@@ -42,6 +45,10 @@ export default function DashboardScreen() {
             description="ถามตอบด้วยภาษาธรรมชาติ"
             href="/assistant"
           />
+        </View>
+
+        <View style={{ marginTop: 28 }}>
+          <PrimaryButton title="ออกจากระบบ" onPress={signOut} />
         </View>
       </ScrollView>
     </SafeAreaView>

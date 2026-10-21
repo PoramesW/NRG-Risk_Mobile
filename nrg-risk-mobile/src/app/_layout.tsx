@@ -15,8 +15,9 @@ import { AnimatedSplashOverlay } from '@/components/animated-icon';
 
 SplashScreen.preventAutoHideAsync();
 
-// หน้าที่เข้าได้โดยไม่ต้องล็อกอิน
-const AUTH_SCREENS = ['login', 'register', 'forgot-password'];
+// หน้าที่ต้องล็อกอินก่อนเข้า
+// หน้าอื่นทั้งหมด (login, register, ลืมรหัสผ่าน) ถือเป็นหน้าสาธารณะ
+const PROTECTED_SCREENS = ['index', 'historical', 'forecast', 'energy-mix', 'risk', 'assistant'];
 
 function RootNavigator() {
   const { isLoggedIn } = useAuth();
@@ -24,18 +25,22 @@ function RootNavigator() {
   const router = useRouter();
 
   useEffect(() => {
-    const first = (segments[0] ?? '') as string;
+    // หน้าแรก (/) ไม่มี segment จึงถือเป็น index
+    const first = (segments[0] ?? 'index') as string;
+
+    // บันทึกไว้ดูตอนตรวจปัญหา ลบทิ้งได้เมื่อระบบนำทางนิ่งแล้ว
+    console.log('[nav]', { segments, isLoggedIn });
 
     // อย่าเปลี่ยนหน้าซ้ำเมื่ออยู่หน้า "ไม่พบหน้า" เพื่อกันวนลูป
     if (first === '+not-found') {
       return;
     }
 
-    const inAuthScreen = AUTH_SCREENS.includes(first);
+    const isProtected = PROTECTED_SCREENS.includes(first);
 
-    if (!isLoggedIn && !inAuthScreen) {
+    if (!isLoggedIn && isProtected) {
       router.replace('/login');
-    } else if (isLoggedIn && inAuthScreen) {
+    } else if (isLoggedIn && !isProtected) {
       router.replace('/');
     }
   }, [isLoggedIn, segments, router]);

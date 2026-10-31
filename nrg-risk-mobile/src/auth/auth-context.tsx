@@ -1,12 +1,16 @@
 import { createContext, ReactNode, useContext, useMemo, useState } from 'react';
 
+import * as authApi from '@/api/auth';
+
 type User = {
   name: string;
   email: string;
+  role: string;
 };
 
 type AuthContextValue = {
   user: User | null;
+  token: string | null;
   isLoggedIn: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
@@ -16,56 +20,46 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-// ===== ข้อมูลจำลอง: ตอนต่อ Backend จริงให้แก้เฉพาะในไฟล์นี้ =====
-const wait = (ms = 600) => new Promise<void>((resolve) => setTimeout(resolve, ms));
-
-function checkEmail(email: string) {
-  if (!email.includes('@')) {
-    throw new Error('รูปแบบอีเมลไม่ถูกต้อง');
-  }
-}
-
-function checkPassword(password: string) {
-  if (password.length < 6) {
-    throw new Error('รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร');
-  }
+function toUser(apiUser: authApi.ApiUser): User {
+  return { name: apiUser.username, email: apiUser.email, role: apiUser.role };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
-      isLoggedIn: user !== null,
+      token,
+      isLoggedIn: user !== null && token !== null,
 
       async signIn(email, password) {
-        await wait();
-        checkEmail(email);
-        checkPassword(password);
-        setUser({ name: email.split('@')[0], email });
+        const result = await authApi.login(email.trim(), password);
+        setToken(result.access_token);
+        setUser(toUser(result.user));
       },
 
       async signUp(name, email, password) {
-        await wait();
-        if (name.trim().length === 0) {
-          throw new Error('กรุณากรอกชื่อ');
-        }
-        checkEmail(email);
-        checkPassword(password);
-        setUser({ name: name.trim(), email });
+        const result = await authApi.register(name.trim(), email.trim(), password);
+        setToken(result.access_token);
+        setUser(toUser(result.user));
       },
 
       signOut() {
         setUser(null);
+        setToken(null);
       },
 
+      // Backend ยังไม่มี endpoint นี้ จึงยังเป็นฉบับจำลอง
       async requestPasswordReset(email) {
-        await wait();
-        checkEmail(email);
+        await new Promise<void>((resolve) => setTimeout(resolve, 600));
+        if (!email.includes('@')) {
+          throw new Error('รูปแบบอีเมลไม่ถูกต้อง');
+        }
       },
     }),
-    [user],
+    [user, token],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

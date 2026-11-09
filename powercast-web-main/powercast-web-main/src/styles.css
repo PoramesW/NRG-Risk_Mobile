@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --pc-canvas: #f5f7fb;
+  --pc-surface: #ffffff;
+  --pc-surface-muted: #eef2f8;
+  --pc-surface-accent: #eff5ff;
+  --pc-border: #e2e8f2;
+  --pc-border-strong: #cbd5e4;
+  --pc-ink: #0f172a;
+  --pc-ink-secondary: #334155;
+  --pc-ink-muted: #526077;
+  --pc-accent: #1d4ed8;
+  --pc-accent-hover: #1e40af;
+  --pc-accent-soft: #eff6ff;
+  --pc-teal: #0d9488;
+  --pc-violet: #6d28d9;
+  --pc-amber: #b45309;
+  --pc-danger: #be123c;
+  --pc-radius-card: 20px;
+  --pc-radius-control: 14px;
+  --pc-radius-pill: 999px;
+}
+
+html,
+body,
+#root {
+  background-color: var(--pc-canvas);
+  color: var(--pc-ink);
+  caret-color: var(--pc-accent);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-underline-offset: 3px;
+}
+
+::selection {
+  background-color: #dbeafe;
+  color: #0f172a;
+}
+
+/* Tabular numerals for data alignment on web */
+[data-tabular='true'],
+table,
+code {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom soft minimal scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--pc-canvas);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e4;
+  border-radius: 999px;
+  border: 2px solid var(--pc-canvas);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+:focus-visible {
+  outline: 2px solid var(--pc-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
